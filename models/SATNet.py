@@ -416,21 +416,6 @@ class SATNet(nn.Module):
         decoder_2 = self.refine_2(pyramid_dt_2 + pyramid_td_2, semantic_info, texture_info)
         decoder_1 = self.refine_1(pyramid_dt_1 + pyramid_td_1, semantic_info, texture_info)
 
-        fusion_1 = torch.mean(decoder_1, dim=1, keepdim=True)
-        fusion_2 = torch.mean(decoder_2, dim=1, keepdim=True)
-        fusion_3 = torch.mean(decoder_3, dim=1, keepdim=True)
-        fusion_4 = torch.mean(decoder_4, dim=1, keepdim=True)
-        fusion_5 = torch.mean(decoder_5, dim=1, keepdim=True)
-        fusion_list = [fusion_1, fusion_2, fusion_3, fusion_4, fusion_5]
-        
-
-        out5_att = torch.mean(decoder_5, dim=1, keepdim=True)
-        out4_att = torch.mean(decoder_4, dim=1, keepdim=True)
-        out3_att = torch.mean(decoder_3, dim=1, keepdim=True)
-        out2_att = torch.mean(decoder_2, dim=1, keepdim=True)
-        out1_att = torch.mean(decoder_1, dim=1, keepdim=True)
-        out_att = [out1_att, out2_att, out3_att, out4_att, out5_att]
-
         # decoder for saliency reasoning
         decoder_4 = self.conv_trans(torch.cat([self.up2(decoder_5), decoder_4], dim=1))
         decoder_3 = self.conv_trans(torch.cat([self.up2(decoder_4), decoder_3], dim=1))
@@ -439,7 +424,6 @@ class SATNet(nn.Module):
 
         pre = self.conv_pre(decoder_1)
 
-        torch.mean(x, dim=1, keepdim=True)
 
         return self.up2(pre), self.up2(texture_pre), self.up4(self.up2(semantic_pre))
 
