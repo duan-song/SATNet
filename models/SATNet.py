@@ -351,22 +351,15 @@ class SATNet(nn.Module):
         #        rgb_list = self.rgb_swin(x)
         #        depth_list = self.depth_swin(d)
 
-        start_time_encoder = time.time()
         rgb1, rgb2, rgb3, rgb4, rgb5 = self.rgb_mobile(x)
         depth1, depth2, depth3, depth4, depth5 = self.depth_mobile(d)
-        end_time_encoder = time.time()
-#        print("the backbone time is {}".format(end_time_encoder-start_time_encoder))
 
-        start_time_dam = time.time()
         f5 = self.rgbd_fusion_5(rgb5, depth5)
         f4 = self.rgbd_fusion_4(rgb4, depth4)
         f3 = self.rgbd_fusion_3(rgb3, depth3)
         f2 = self.rgbd_fusion_2(rgb2, depth2)
         f1 = self.rgbd_fusion_1(rgb1, depth1)
-        end_time_dam = time.time()
-#        print("the DAM time is {}".format(end_time_dam-start_time_dam))
 
-        start_time_cipn = time.time()
         d5_reduce = self.deconv_layer_5(f5)
         d4_reduce = self.deconv_layer_4(f4)
         d3_reduce = self.deconv_layer_3(f3)
@@ -430,8 +423,6 @@ class SATNet(nn.Module):
         fusion_5 = torch.mean(decoder_5, dim=1, keepdim=True)
         fusion_list = [fusion_1, fusion_2, fusion_3, fusion_4, fusion_5]
         
-        end_time_cipn = time.time()
-#        print("the CIPN time is {}".format(end_time_cipn-start_time_cipn))
 
         out5_att = torch.mean(decoder_5, dim=1, keepdim=True)
         out4_att = torch.mean(decoder_4, dim=1, keepdim=True)
@@ -441,13 +432,10 @@ class SATNet(nn.Module):
         out_att = [out1_att, out2_att, out3_att, out4_att, out5_att]
 
         # decoder for saliency reasoning
-        start_time_decoder = time.time()
         decoder_4 = self.conv_trans(torch.cat([self.up2(decoder_5), decoder_4], dim=1))
         decoder_3 = self.conv_trans(torch.cat([self.up2(decoder_4), decoder_3], dim=1))
         decoder_2 = self.conv_trans(torch.cat([self.up2(decoder_3), decoder_2], dim=1))
         decoder_1 = self.conv_trans(torch.cat([self.up2(decoder_2), decoder_1], dim=1))
-        end_time_decoder = time.time()
-#        print("the Decoder time is {}".format(end_time_decoder-start_time_decoder))
 
         pre = self.conv_pre(decoder_1)
 
